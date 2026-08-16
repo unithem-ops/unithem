@@ -1,5 +1,10 @@
 const SHEET_NAME = "KES_KESIHATAN";
 const EVIDENCE_FOLDER_NAME = "e-Kesihatan SAGA - Bukti Dokumen";
+const REQUIRED_HEADERS = [
+  "id","tarikh","namaMurid","noKp","tingkatan","kelas","jantina","kamar",
+  "simptom","penyakitSindrom","suhu","status","tarikhCutiMula","tarikhCutiTamat",
+  "catatan","buktiUrl","updatedAt"
+];
 
 function doPost(e) {
   try {
@@ -25,19 +30,41 @@ function sheet_() {
   let sh = ss.getSheetByName(SHEET_NAME);
   if (!sh) {
     sh = ss.insertSheet(SHEET_NAME);
-    sh.appendRow(["id","tarikh","namaMurid","noKp","tingkatan","kelas","jantina","kamar","simptom","suhu","status","tarikhCutiMula","tarikhCutiTamat","catatan","buktiUrl","updatedAt"]);
+    sh.getRange(1,1,1,REQUIRED_HEADERS.length).setValues([REQUIRED_HEADERS]);
+  } else {
+    ensureHeaders_(sh);
   }
   return sh;
 }
 
-function headers_(sh) { return sh.getRange(1,1,1,sh.getLastColumn()).getValues()[0]; }
-function rowToObject_(headers,row){ const out={}; headers.forEach((h,i)=>out[h]=row[i]); return out; }
+function ensureHeaders_(sh) {
+  const lastCol = Math.max(sh.getLastColumn(), 1);
+  const current = sh.getRange(1,1,1,lastCol).getValues()[0].map(String);
+  REQUIRED_HEADERS.forEach(function(header){
+    if (current.indexOf(header) === -1) {
+      sh.getRange(1, sh.getLastColumn() + 1).setValue(header);
+      current.push(header);
+    }
+  });
+}
+
+function headers_(sh) {
+  ensureHeaders_(sh);
+  return sh.getRange(1,1,1,sh.getLastColumn()).getValues()[0];
+}
+
+function rowToObject_(headers,row){
+  const out={};
+  headers.forEach((h,i)=>out[h]=row[i]);
+  return out;
+}
 
 function listCases_() {
   const sh = sheet_();
   if (sh.getLastRow() < 2) return [];
   const headers = headers_(sh);
-  return sh.getRange(2,1,sh.getLastRow()-1,sh.getLastColumn()).getValues().map(r=>rowToObject_(headers,r)).filter(r=>r.id);
+  return sh.getRange(2,1,sh.getLastRow()-1,sh.getLastColumn()).getValues()
+    .map(r=>rowToObject_(headers,r)).filter(r=>r.id);
 }
 
 function createCase_(record) {
@@ -51,7 +78,10 @@ function createCase_(record) {
 
 function findRowById_(sh,id){
   if (sh.getLastRow() < 2) return -1;
-  const ids = sh.getRange(2,1,sh.getLastRow()-1,1).getValues().flat();
+  const headers = headers_(sh);
+  const idCol = headers.indexOf("id") + 1;
+  if (idCol < 1) throw new Error("Kolum id tidak ditemui");
+  const ids = sh.getRange(2,idCol,sh.getLastRow()-1,1).getValues().flat();
   const idx = ids.findIndex(v => String(v) === String(id));
   return idx < 0 ? -1 : idx + 2;
 }
@@ -62,9 +92,11 @@ function updateCase_(record) {
   const row = findRowById_(sh,record.id);
   if (row < 0) throw new Error("Rekod tidak ditemui");
   const headers = headers_(sh);
-  record.updatedAt = new Date().toISOString();
-  sh.getRange(row,1,1,headers.length).setValues([headers.map(h => record[h] ?? "")]);
-  return record;
+  const existing = sh.getRange(row,1,1,headers.length).getValues()[0];
+  const existingObj = rowToObject_(headers,existing);
+  const merged = Object.assign({}, existingObj, record, {updatedAt:new Date().toISOString()});
+  sh.getRange(row,1,1,headers.length).setValues([headers.map(h => merged[h] ?? "")]);
+  return merged;
 }
 
 function deleteCase_(id) {
