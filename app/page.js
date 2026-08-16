@@ -5,7 +5,8 @@ import "./globals.css";
 
 const API = process.env.NEXT_PUBLIC_APPS_SCRIPT_URL || "";
 const LOGO = "https://drive.google.com/thumbnail?id=1A0CfT92eeRQ_lrDoYp0bxE58E7RAmMd3&sz=w300";
-const SIMPTOM_OPTIONS=["Demam","Batuk / Selesema","Sakit Kepala","Sakit Perut","Muntah / Cirit-birit","Kecederaan","Penyakit Kulit","Lain-lain"];\nconst PENYAKIT_OPTIONS=["Influenza / ILI","HFMD","Denggi","Keracunan Makanan","Gastroenteritis","Konjunktivitis","Cacar Air","Penyakit Kulit","Lain-lain"];
+const SIMPTOM_OPTIONS=["Demam","Batuk / Selesema","Sakit Kepala","Sakit Perut","Muntah / Cirit-birit","Kecederaan","Penyakit Kulit","Lain-lain"];
+const PENYAKIT_OPTIONS=["Influenza / ILI","HFMD","Denggi","Keracunan Makanan","Gastroenteritis","Konjunktivitis","Cacar Air","Penyakit Kulit","Lain-lain"];
 const STATUS_OPTIONS=["Pemantauan","Sedang Dirawat","Kembali ke Asrama","Rehat / MC","Kuarantin","Dirujuk ke Hospital","Pulang Bersama Penjaga","Wabak Aktif","Terkawal","Ditutup","Selesai","Lain-lain"];
 const KAMAR_HANG_NADIM=["DG-B1","DG-B2","DG-T1","DG-B11","DG-T11","DG-L11","DG-S11","DG-T2","DG-L1","DG-L2","DG-S1","DG-MPM(A)","DG-MPM(S)","DG-S2","D1-B3","D1-B4","D1-B5","D1-B6","D1-T3","D1-T4","D1-T5","D1-T6","D1-L3","D1-L4","D1-L5","D1-L6","D1-S3","D1-S4","D1-S5","D1-S6","D1-H31","D2-B7","D2-B8","D2-B9","D2-B10","D2-T7","D2-T8","D2-T9","D2-T10","D2-L7","D2-L8","D2-L9","D2-L10","D2-S7","D2-S8","D2-S9","D2-S10"];
 const KAMAR_TUN_FATIMAH=["EG-B1","EG-B2","EG-T1","EG-B11","EG-T11","EG-L11","EG-S11","EG-T2","EG-L1","EG-L2","EG-S1","EG-MPM(A)","EG-MPM(S)","EG-S2","E1-B3","E1-B4","E1-B5","E1-B6","E1-T3","E1-T4","E1-T5","E1-T6","E1-L3","E1-L4","E1-L5","E1-L6","E1-S3","E1-S4","E1-S5","E1-S6","E1-H31","E2-B7","E2-B8","E2-B9","E2-B10","E2-T7","E2-T8","E2-T9","E2-T10","E2-L7","E2-L8","E2-L9","E2-L10","E2-S7","E2-S8","E2-S9","E2-S10"];
