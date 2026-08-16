@@ -16,4 +16,4 @@ Source code asas Next.js untuk pembinaan semula sistem e-Kesihatan SAGA.
 2. Deploy sebagai Web App.
 3. Tetapkan `NEXT_PUBLIC_APPS_SCRIPT_URL` pada Vercel kepada URL Web App tersebut.
 
-> Jangan deploy terus ke production sebelum preview diuji.
+> Konfigurasi Vercel dikemas kini untuk menggunakan endpoint Apps Script melalui environment variable.
