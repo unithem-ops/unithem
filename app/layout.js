@@ -1,3 +1,5 @@
+import EvidenceEnhancer from "./EvidenceEnhancer";
+
 export const metadata = {
   title: "e-Kesihatan & Wabak SAGA",
   description: "Pemantauan kesihatan dan pengesanan awal kelompok penyakit",
@@ -6,7 +8,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ms">
-      <body>{children}</body>
+      <body>
+        {children}
+        <EvidenceEnhancer />
+      </body>
     </html>
   );
 }
