@@ -4,6 +4,16 @@ import { useEffect, useMemo, useState } from "react";
 import "./globals.css";
 
 const API = process.env.NEXT_PUBLIC_APPS_SCRIPT_URL || "";
+const SIMPTOM_OPTIONS = [
+  "Demam",
+  "Batuk / Selesema",
+  "Sakit Kepala",
+  "Sakit Perut",
+  "Muntah / Cirit-birit",
+  "Kecederaan",
+  "Penyakit Kulit",
+  "Lain-lain"
+];
 
 const emptyForm = {
   id: "",
@@ -14,7 +24,8 @@ const emptyForm = {
   kelas: "Tuah",
   jantina: "Lelaki",
   kamar: "",
-  simptom: "",
+  simptom: "Demam",
+  simptomLain: "",
   suhu: "",
   status: "Dalam Pemantauan",
   tarikhCutiMula: "",
@@ -71,7 +82,13 @@ export default function Home() {
   }
 
   function openEdit(r) {
-    setForm({ ...emptyForm, ...r });
+    const known = SIMPTOM_OPTIONS.includes(r.simptom);
+    setForm({
+      ...emptyForm,
+      ...r,
+      simptom: known ? r.simptom : "Lain-lain",
+      simptomLain: known ? "" : (r.simptom || "")
+    });
     setModal(true);
   }
 
@@ -79,10 +96,16 @@ export default function Home() {
     e.preventDefault();
     try {
       setLoading(true);
-      if (form.id) {
-        await api("updateCase", { record: form });
+      const recordToSave = {
+        ...form,
+        simptom: form.simptom === "Lain-lain" ? form.simptomLain.trim() : form.simptom
+      };
+      delete recordToSave.simptomLain;
+      if (!recordToSave.simptom) throw new Error("Sila nyatakan simptom utama.");
+      if (recordToSave.id) {
+        await api("updateCase", { record: recordToSave });
       } else {
-        await api("createCase", { record: form });
+        await api("createCase", { record: recordToSave });
       }
       setModal(false);
       await load();
@@ -181,7 +204,8 @@ export default function Home() {
               <label>Kelas<select value={form.kelas} onChange={e=>setForm({...form,kelas:e.target.value})}>{["Tuah","Jebat","Kasturi","Lekir","Lekiu"].map(x=><option key={x}>{x}</option>)}</select></label>
               <label>Jantina<select value={form.jantina} onChange={e=>setForm({...form,jantina:e.target.value})}><option>Lelaki</option><option>Perempuan</option></select></label>
               <label>Kamar<input value={form.kamar} onChange={e=>setForm({...form,kamar:e.target.value})}/></label>
-              <label>Simptom Utama<input required placeholder="Taip simptom jika tiada dalam senarai" value={form.simptom} onChange={e=>setForm({...form,simptom:e.target.value})}/></label>
+              <label>Simptom Utama<select required value={form.simptom} onChange={e=>setForm({...form,simptom:e.target.value,simptomLain:e.target.value === "Lain-lain" ? form.simptomLain : ""})}>{SIMPTOM_OPTIONS.map(x=><option key={x}>{x}</option>)}</select></label>
+              {form.simptom === "Lain-lain" && <label className="full">Nyatakan Simptom<input required placeholder="Taip simptom yang tidak tersenarai" value={form.simptomLain} onChange={e=>setForm({...form,simptomLain:e.target.value})}/></label>}
               <label>Suhu Badan<input value={form.suhu} onChange={e=>setForm({...form,suhu:e.target.value})}/></label>
               <label>Status<select value={form.status} onChange={e=>setForm({...form,status:e.target.value})}>
                 <option>Dalam Pemantauan</option><option>Dibawa ke Klinik</option><option>Dibawa ke Hospital</option><option>Kuarantin</option><option>Cuti Sakit</option><option>Susulan</option><option>Selesai</option>
